@@ -1,0 +1,484 @@
+/*
+ * Boot sector validation tests, against the production exfat_boot.h.
+ *
+ * Covers spec.md 3.1 (accepted/rejected conditions, G1 ordering) and 3.2
+ * (boot region checksum, and B3: every repeated word in sector 11).
+ *
+ *     ./build.sh && ./t_boot
+ */
+
+#include <stdio.h>
+#include <stdint.h>
+#include <string.h>
+
+typedef uint64_t UQUAD;
+typedef uint32_t ULONG;
+typedef uint16_t UWORD;
+typedef uint8_t  UBYTE;
+
+#include "exfat_boot.h"
+#include <dos/exfat.h>
+
+static int failures;
+
+static void check(const char *what, int ok)
+{
+    printf("  %-60s %s\n", what, ok ? "ok" : "FAIL");
+    if (!ok)
+        failures++;
+}
+
+static void wr16(UBYTE *p, unsigned off, UWORD v)
+{
+    p[off] = (UBYTE)(v & 0xFF); p[off + 1] = (UBYTE)(v >> 8);
+}
+
+static void wr32(UBYTE *p, unsigned off, ULONG v)
+{
+    unsigned i;
+    for (i = 0; i < 4; i++) p[off + i] = (UBYTE)((v >> (i * 8)) & 0xFF);
+}
+
+static void wr64(UBYTE *p, unsigned off, UQUAD v)
+{
+    unsigned i;
+    for (i = 0; i < 8; i++) p[off + i] = (UBYTE)((v >> (i * 8)) & 0xFF);
+}
+
+/*
+ * A minimal but self-consistent 64 MiB volume: 512-byte sectors, 8 sectors
+ * per cluster, FAT at sector 24.
+ */
+static void make_good(UBYTE *b)
+{
+    ULONG volume_sectors = 131072;      /* 64 MiB */
+    ULONG heap = 1024;
+    ULONG clusters = (volume_sectors - heap) >> 3;
+
+    memset(b, 0, 512);
+    b[0] = 0xEB; b[1] = 0x76; b[2] = 0x90;
+    memcpy(b + EXFAT_BOOT_FSNAME, "EXFAT   ", 8);
+    wr64(b, EXFAT_BOOT_VOLUMELENGTH, volume_sectors);
+    wr32(b, EXFAT_BOOT_FATOFFSET,    24);
+    wr32(b, EXFAT_BOOT_FATLENGTH,    heap - 24);
+    wr32(b, EXFAT_BOOT_HEAPOFFSET,   heap);
+    wr32(b, EXFAT_BOOT_CLUSTERCOUNT, clusters);
+    wr32(b, EXFAT_BOOT_ROOTCLUSTER,  2);
+    wr16(b, EXFAT_BOOT_REVISION,     0x0100);
+    b[EXFAT_BOOT_SECTORSHIFT]  = 9;
+    b[EXFAT_BOOT_CLUSTERSHIFT] = 3;
+    b[EXFAT_BOOT_NUMBEROFFATS] = 1;
+    b[EXFAT_BOOT_PERCENTINUSE] = 50;
+    wr16(b, EXFAT_BOOT_SIGNATURE, 0xAA55);
+}
+
+#define EXPECT(desc, mutate, want)                                       \
+    do {                                                                 \
+        UBYTE b[512]; struct exfat_geometry g;                           \
+        make_good(b); { mutate; }                                        \
+        check(desc, exfat_validate_boot(b, sizeof b, &g) == (want));     \
+    } while (0)
+
+static void test_accept(void)
+{
+    UBYTE b[512];
+    struct exfat_geometry g;
+
+    puts("3.1  a well-formed volume");
+    make_good(b);
+    check("accepted", exfat_validate_boot(b, sizeof b, &g) == EXFAT_BOOT_OK);
+    check("geometry read back correctly",
+        g.sector_size == 512 && g.cluster_shift == 3
+        && g.volume_length == 131072 && g.heap_offset == 1024
+        && g.root_cluster == 2 && g.percent_in_use == 50
+        && g.volume_flags == 0);
+    {
+        /* 4096-byte sectors: the FAT covers four times as many entries per
+           sector, so the same geometry is still self-consistent. */
+        UBYTE c[512];
+        struct exfat_geometry g2;
+
+        make_good(c);
+        c[EXFAT_BOOT_SECTORSHIFT] = 12;
+        check("4096-byte sectors accepted",
+            exfat_validate_boot(c, sizeof c, &g2) == EXFAT_BOOT_OK
+            && g2.sector_size == 4096);
+    }
+}
+
+static void test_identity(void)
+{
+    puts("\n3.1  identity");
+    EXPECT("wrong JumpBoot rejected", b[1] = 0x00, EXFAT_BOOT_NOT_EXFAT);
+    EXPECT("wrong FileSystemName rejected",
+        memcpy(b + EXFAT_BOOT_FSNAME, "NTFS    ", 8), EXFAT_BOOT_NOT_EXFAT);
+    EXPECT("FileSystemName without the trailing spaces rejected",
+        memcpy(b + EXFAT_BOOT_FSNAME, "EXFAT\0\0\0", 8), EXFAT_BOOT_NOT_EXFAT);
+    EXPECT("non-zero MustBeZero rejected",
+        b[EXFAT_BOOT_MUSTBEZERO + 20] = 1, EXFAT_BOOT_NOT_EXFAT);
+    EXPECT("missing boot signature rejected",
+        wr16(b, EXFAT_BOOT_SIGNATURE, 0), EXFAT_BOOT_NOT_EXFAT);
+    {
+        UBYTE b[512];
+        struct exfat_geometry g;
+
+        make_good(b);
+        check("buffer shorter than a sector rejected",
+            exfat_validate_boot(b, 511, &g) == EXFAT_BOOT_NOT_EXFAT);
+    }
+}
+
+static void test_version_and_texfat(void)
+{
+    puts("\n1.1, 1.2  revision and TexFAT");
+    EXPECT("revision 2.00 rejected",
+        wr16(b, EXFAT_BOOT_REVISION, 0x0200), EXFAT_BOOT_WRONG_VERSION);
+    EXPECT("revision 1.01 rejected (exact 1.00 policy)",
+        wr16(b, EXFAT_BOOT_REVISION, 0x0101), EXFAT_BOOT_WRONG_VERSION);
+    EXPECT("NumberOfFats = 2 is TexFAT, refused",
+        b[EXFAT_BOOT_NUMBEROFFATS] = 2, EXFAT_BOOT_TEXFAT);
+    EXPECT("NumberOfFats = 0 rejected",
+        b[EXFAT_BOOT_NUMBEROFFATS] = 0, EXFAT_BOOT_BAD_GEOMETRY);
+    EXPECT("ActiveFat set with a single FAT rejected",
+        wr16(b, EXFAT_BOOT_VOLUMEFLAGS, EXFAT_VOLUMEFLAG_ACTIVEFAT),
+        EXFAT_BOOT_WRONG_VERSION);
+}
+
+static void test_geometry(void)
+{
+    puts("\n3.1  geometry bounds");
+    EXPECT("sector shift 8 rejected",
+        b[EXFAT_BOOT_SECTORSHIFT] = 8, EXFAT_BOOT_BAD_GEOMETRY);
+    EXPECT("sector shift 13 rejected",
+        b[EXFAT_BOOT_SECTORSHIFT] = 13, EXFAT_BOOT_BAD_GEOMETRY);
+    EXPECT("cluster larger than 32 MiB rejected",
+        b[EXFAT_BOOT_CLUSTERSHIFT] = 17, EXFAT_BOOT_BAD_GEOMETRY);
+    EXPECT("PercentInUse 101 rejected",
+        b[EXFAT_BOOT_PERCENTINUSE] = 101, EXFAT_BOOT_BAD_GEOMETRY);
+    EXPECT("PercentInUse 0xFF accepted as unknown",
+        b[EXFAT_BOOT_PERCENTINUSE] = 0xFF, EXFAT_BOOT_OK);
+    EXPECT("volume smaller than 1 MiB rejected",
+        wr64(b, EXFAT_BOOT_VOLUMELENGTH, 100), EXFAT_BOOT_BAD_GEOMETRY);
+    EXPECT("FAT starting inside the boot region rejected",
+        wr32(b, EXFAT_BOOT_FATOFFSET, 23), EXFAT_BOOT_BAD_GEOMETRY);
+    EXPECT("heap before the FAT rejected",
+        wr32(b, EXFAT_BOOT_HEAPOFFSET, 20), EXFAT_BOOT_BAD_GEOMETRY);
+    EXPECT("FAT overlapping the heap rejected",
+        wr32(b, EXFAT_BOOT_FATLENGTH, 2000), EXFAT_BOOT_BAD_GEOMETRY);
+    EXPECT("heap beyond the volume rejected",
+        wr32(b, EXFAT_BOOT_HEAPOFFSET, 200000), EXFAT_BOOT_BAD_GEOMETRY);
+    EXPECT("FAT too short for ClusterCount rejected",
+        wr32(b, EXFAT_BOOT_FATLENGTH, 1), EXFAT_BOOT_BAD_GEOMETRY);
+    EXPECT("ClusterCount disagreeing with the heap rejected",
+        wr32(b, EXFAT_BOOT_CLUSTERCOUNT, 100), EXFAT_BOOT_BAD_GEOMETRY);
+    EXPECT("root cluster 1 rejected",
+        wr32(b, EXFAT_BOOT_ROOTCLUSTER, 1), EXFAT_BOOT_BAD_GEOMETRY);
+    EXPECT("root cluster past the heap rejected",
+        wr32(b, EXFAT_BOOT_ROOTCLUSTER, 0xFFFFFF), EXFAT_BOOT_BAD_GEOMETRY);
+}
+
+static void test_ordering(void)
+{
+    UBYTE b[512];
+    struct exfat_geometry g;
+
+    puts("\nG1  validation order");
+
+    /*
+     * A volume that is both not-exFAT and has impossible geometry must report
+     * the identity failure, not the geometry one: everything below the
+     * identity check is meaningless if this is not an exFAT volume at all.
+     */
+    make_good(b);
+    memcpy(b + EXFAT_BOOT_FSNAME, "NTFS    ", 8);
+    b[EXFAT_BOOT_SECTORSHIFT] = 99;
+    check("identity is checked before geometry",
+        exfat_validate_boot(b, sizeof b, &g) == EXFAT_BOOT_NOT_EXFAT);
+
+    /* Likewise TexFAT is reported before any geometry complaint. */
+    make_good(b);
+    b[EXFAT_BOOT_NUMBEROFFATS] = 2;
+    wr32(b, EXFAT_BOOT_ROOTCLUSTER, 0);
+    check("TexFAT is reported before geometry",
+        exfat_validate_boot(b, sizeof b, &g) == EXFAT_BOOT_TEXFAT);
+}
+
+/* Sectors 1..10 of the boot region: not the boot sector, so no exclusions. */
+static void make_filler(UBYTE *sec, int n)
+{
+    int i;
+    for (i = 0; i < 512; i++)
+        sec[i] = (UBYTE)((i * 7 + n * 31) & 0xFF);
+}
+
+static ULONG boot_region_sum(const UBYTE *sector0)
+{
+    UBYTE filler[512];
+    ULONG sum = 0;
+    int i;
+
+    sum = exfat_boot_checksum(sum, sector0, 512, 0);
+    for (i = 1; i < 11; i++)
+    {
+        make_filler(filler, i);
+        sum = exfat_boot_checksum(sum, filler, 512, (ULONG)i);
+    }
+    return sum;
+}
+
+static void test_checksum(void)
+{
+    UBYTE sec[512];
+    ULONG base;
+
+    puts("\n3.2  boot region checksum");
+
+    make_good(sec);
+    base = boot_region_sum(sec);
+
+    /* VolumeFlags and PercentInUse mutate in normal use and are excluded. */
+    make_good(sec);
+    wr16(sec, EXFAT_BOOT_VOLUMEFLAGS, 0x0002);
+    sec[EXFAT_BOOT_PERCENTINUSE] = 99;
+    check("VolumeFlags and PercentInUse are excluded",
+        boot_region_sum(sec) == base);
+
+    /* The byte immediately after the excluded PercentInUse is not excluded. */
+    make_good(sec);
+    sec[EXFAT_BOOT_PERCENTINUSE + 1] ^= 0xFF;
+    check("the byte after PercentInUse is still covered",
+        boot_region_sum(sec) != base);
+
+    /* Any other change must be caught. */
+    make_good(sec);
+    sec[EXFAT_BOOT_VOLUMESERIAL] ^= 0xFF;
+    check("a change elsewhere in sector 0 is caught",
+        boot_region_sum(sec) != base);
+
+    /* A change in one of the following sectors must be caught too. */
+    {
+        UBYTE filler[512];
+        ULONG sum = 0;
+        int i;
+
+        make_good(sec);
+        sum = exfat_boot_checksum(sum, sec, 512, 0);
+        for (i = 1; i < 11; i++)
+        {
+            make_filler(filler, i);
+            if (i == 5)
+                filler[100] ^= 0xFF;
+            sum = exfat_boot_checksum(sum, filler, 512, (ULONG)i);
+        }
+        check("a change in sector 5 is caught", sum != base);
+    }
+
+    /* The exclusion is positional and applies only to sector 0. */
+    {
+        UBYTE filler[512];
+        ULONG sum = 0;
+        int i;
+
+        make_good(sec);
+        sum = exfat_boot_checksum(sum, sec, 512, 0);
+        for (i = 1; i < 11; i++)
+        {
+            make_filler(filler, i);
+            if (i == 3)
+                filler[EXFAT_BOOT_PERCENTINUSE] ^= 0xFF;
+            sum = exfat_boot_checksum(sum, filler, 512, (ULONG)i);
+        }
+        check("the same offset in a later sector is NOT excluded", sum != base);
+    }
+}
+
+static void test_write_flags(void)
+{
+    UWORD flags;
+
+    puts("\n3.1.13  writable transaction flags");
+    flags = exfat_volume_flags_begin_write(
+        EXFAT_VOLUMEFLAG_MEDIAFAIL | EXFAT_VOLUMEFLAG_CLEARZERO | 0x8000U);
+    check("begin sets dirty, clears ClearToZero and preserves other bits",
+        (flags & EXFAT_VOLUMEFLAG_DIRTY) != 0
+            && (flags & EXFAT_VOLUMEFLAG_CLEARZERO) == 0
+            && (flags & EXFAT_VOLUMEFLAG_MEDIAFAIL) != 0
+            && (flags & 0x8000U) != 0);
+    check("successful clean-origin transaction clears dirty",
+        (exfat_volume_flags_finish_write(flags, 0, 1)
+            & EXFAT_VOLUMEFLAG_DIRTY) == 0);
+    check("failed transaction remains dirty",
+        (exfat_volume_flags_finish_write(flags, 0, 0)
+            & EXFAT_VOLUMEFLAG_DIRTY) != 0);
+    check("pre-existing dirty state is never cleared",
+        (exfat_volume_flags_finish_write(flags, 1, 1)
+            & EXFAT_VOLUMEFLAG_DIRTY) != 0);
+}
+
+static void test_b3(void)
+{
+    UBYTE sec11[512];
+    ULONG expected = 0xDEADBEEFu;
+    unsigned i;
+
+    puts("\nB3   every repeated word in sector 11");
+
+    for (i = 0; i < 512; i += 4)
+        wr32(sec11, i, expected);
+    check("all copies matching is accepted",
+        exfat_verify_boot_checksum(sec11, 512, expected));
+
+    check("a wrong expected value is rejected",
+        !exfat_verify_boot_checksum(sec11, 512, expected + 1));
+
+    /* The one that a first-word-only check would wave through. */
+    wr32(sec11, 508, expected ^ 0xFF);
+    check("LAST copy differing is rejected",
+        !exfat_verify_boot_checksum(sec11, 512, expected));
+
+    for (i = 0; i < 512; i += 4)
+        wr32(sec11, i, expected);
+    wr32(sec11, 256, expected ^ 1);
+    check("a middle copy differing is rejected",
+        !exfat_verify_boot_checksum(sec11, 512, expected));
+
+    for (i = 0; i < 512; i += 4)
+        wr32(sec11, i, expected);
+    wr32(sec11, 0, expected ^ 1);
+    check("the first copy differing is rejected",
+        !exfat_verify_boot_checksum(sec11, 512, expected));
+
+    for (i = 0; i < 512; i += 4)
+        wr32(sec11, i, expected);
+    check("4096-byte sector fully verified",
+        exfat_verify_boot_checksum(sec11, 512, expected));
+    check("a sector size that is not a multiple of 4 is refused",
+        !exfat_verify_boot_checksum(sec11, 510, expected));
+    check("a sector smaller than one word is refused",
+        !exfat_verify_boot_checksum(sec11, 2, expected));
+}
+
+static void test_no_partial_geometry(void)
+{
+    UBYTE b[512];
+    struct exfat_geometry g;
+    unsigned i;
+    const UBYTE *raw = (const UBYTE *)&g;
+    int untouched = 1;
+
+    puts("\n3.1  geometry is not written on failure");
+
+    /* Poison the output, then fail late: the root cluster check is the very
+       last one, so everything before it has already been computed. */
+    memset(&g, 0xA5, sizeof g);
+    make_good(b);
+    wr32(b, EXFAT_BOOT_ROOTCLUSTER, 0);
+    check("late failure reported",
+        exfat_validate_boot(b, sizeof b, &g) == EXFAT_BOOT_BAD_GEOMETRY);
+
+    for (i = 0; i < sizeof g; i++)
+        if (raw[i] != 0xA5)
+            untouched = 0;
+    check("the caller's geometry is left untouched", untouched);
+}
+
+static void test_mount_boundary(void)
+{
+    UBYTE b[512];
+    struct exfat_geometry g;
+
+    puts("\nU3, U7  mount boundary");
+
+    make_good(b);                       /* 131072 sectors of 512 bytes */
+    check("boot sector still valid",
+        exfat_validate_boot(b, sizeof b, &g) == EXFAT_BOOT_OK);
+
+    /* U3: units must match. */
+    check("matching sector and device block size accepted",
+        exfat_check_sector_units(&g, 512) == EXFAT_BOOT_OK);
+    check("T15b: logical 512 on a 4096-byte device refused",
+        exfat_check_sector_units(&g, 4096) == EXFAT_BOOT_BAD_GEOMETRY);
+    check("zero device block size refused",
+        exfat_check_sector_units(&g, 0) == EXFAT_BOOT_BAD_GEOMETRY);
+    {
+        UBYTE c[512];
+        struct exfat_geometry g4;
+
+        make_good(c);
+        c[EXFAT_BOOT_SECTORSHIFT] = 12;         /* 4096-byte logical */
+        exfat_validate_boot(c, sizeof c, &g4);
+        check("T15a: logical 4096 on a 512-byte device refused",
+            exfat_check_sector_units(&g4, 512) == EXFAT_BOOT_BAD_GEOMETRY);
+    }
+
+    /* U7: the volume must fit the partition. */
+    check("volume exactly filling its partition accepted",
+        exfat_check_partition_fit(&g, 2048, 131072) == EXFAT_BOOT_OK);
+    check("T16b: volume smaller than its partition accepted",
+        exfat_check_partition_fit(&g, 2048, 200000) == EXFAT_BOOT_OK);
+    check("T16a: volume one sector larger than its partition REFUSED",
+        exfat_check_partition_fit(&g, 2048, 131071)
+            == EXFAT_BOOT_BAD_GEOMETRY);
+    check("volume far larger than its partition refused",
+        exfat_check_partition_fit(&g, 2048, 100) == EXFAT_BOOT_BAD_GEOMETRY);
+
+    /* U6: the partition extent itself is checked overflow-safely. */
+    check("zero-length partition refused",
+        exfat_check_partition_fit(&g, 2048, 0) == EXFAT_BOOT_BAD_GEOMETRY);
+    check("partition whose end overflows the domain refused",
+        exfat_check_partition_fit(&g, EXFAT_UQUAD_MAX - 10, 1000)
+            == EXFAT_BOOT_BAD_GEOMETRY);
+}
+
+static void test_content_probe(void)
+{
+    UBYTE b[512];
+
+    puts("\ndiscovery  shared exFAT content probe");
+    make_good(b);
+    check("valid exFAT signature routes to FATX",
+        IsExfatBootSector(b, sizeof b));
+    check("short buffers are rejected without inspection",
+        !IsExfatBootSector(b, 511));
+    b[0] = 0xe9;
+    check("wrong jump instruction is rejected",
+        !IsExfatBootSector(b, sizeof b));
+    make_good(b);
+    b[3] = 'N';
+    check("an NTFS-style filesystem name is rejected",
+        !IsExfatBootSector(b, sizeof b));
+    make_good(b);
+    b[11] = 1;
+    check("legacy BPB content is rejected",
+        !IsExfatBootSector(b, sizeof b));
+    make_good(b);
+    b[511] = 0;
+    check("missing boot signature is rejected",
+        !IsExfatBootSector(b, sizeof b));
+    check("content-probed FATX survives generic MBR type 0x07 mapping",
+        ExfatSelectPartitionDosType(ID_EXFAT_DISK, 0x4e544653UL)
+            == ID_EXFAT_DISK);
+    check("non-exFAT partitions retain their generic type mapping",
+        ExfatSelectPartitionDosType(0x4e544653UL, 0x46415402UL)
+            == 0x46415402UL);
+}
+
+int main(void)
+{
+    check("shared automounter handler name matches installed module",
+        strcmp(EXFAT_HANDLER_NAME, "exfat-handler") == 0);
+    test_accept();
+    test_identity();
+    test_version_and_texfat();
+    test_geometry();
+    test_ordering();
+    test_checksum();
+    test_write_flags();
+    test_b3();
+    test_no_partial_geometry();
+    test_mount_boundary();
+    test_content_probe();
+    printf("\n%s (%d failure%s)\n", failures ? "FAILED" : "PASS",
+        failures, failures == 1 ? "" : "s");
+    return failures != 0;
+}

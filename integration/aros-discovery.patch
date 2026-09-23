@@ -1,0 +1,390 @@
+diff --git a/arch/all-hosted/mmakefile b/arch/all-hosted/mmakefile
+index 49b625d216..72bde3e0f5 100644
+--- a/arch/all-hosted/mmakefile
++++ b/arch/all-hosted/mmakefile
+@@ -11,4 +11,5 @@
+ #MM			kernel-fs-cdfs		\
+ #MM			kernel-fs-sfs		\
+ #MM			kernel-fs-fat		\
++#MM			kernel-fs-exfat		\
+ #MM			kernel-partition
+diff --git a/arch/all-native/mmakefile.src b/arch/all-native/mmakefile.src
+index cb5c04003e..2e5675dbce 100644
+--- a/arch/all-native/mmakefile.src
++++ b/arch/all-native/mmakefile.src
+@@ -15,7 +15,8 @@ include $(SRCDIR)/config/aros.cfg
+ 
+ #MM- kernel-fs-xtra:		\
+ #MM	kernel-fs-sfs		\
+-#MM	kernel-fs-fat
++#MM	kernel-fs-fat		\
++#MM	kernel-fs-exfat
+ 
+ #MM kernel-package-fs:		\
+ #MM	kernel-fs-xtra	\
+@@ -23,7 +24,7 @@ include $(SRCDIR)/config/aros.cfg
+ 
+ FS_LIBS     := partition
+ FS_CORE_HANDLERS := afs cdrom
+-FS_XTRA_HANDLERS := sfs fat
++FS_XTRA_HANDLERS := sfs fat exfat
+ 
+ %make_package mmake=kernel-package-fs file=$(AROS_BOOT)/aros-fs.pkg packfmt=$(AROS_PACKAGE_FMT) \
+ 	      handlers="$(FS_CORE_HANDLERS) $(FS_XTRA_HANDLERS)" libs=$(FS_LIBS)
+diff --git a/arch/arm-raspi/boot/mmakefile.src b/arch/arm-raspi/boot/mmakefile.src
+index a7ff16d493..008506ea7a 100644
+--- a/arch/arm-raspi/boot/mmakefile.src
++++ b/arch/arm-raspi/boot/mmakefile.src
+@@ -73,6 +73,7 @@ ARM_BSP := aros-$(AROS_TARGET_CPU)-bsp.rom
+ #MM kernel-fs-afs-quick \
+ #MM kernel-fs-cdvdfs-quick \
+ #MM kernel-fs-fat-quick \
++#MM kernel-fs-exfat-quick \
+ #MM kernel-fs-sfs-quick \
+ #MM kernel-fs-ram-quick \
+ #MM kernel-processor-quick \
+@@ -127,6 +128,7 @@ ARM_BSP := aros-$(AROS_TARGET_CPU)-bsp.rom
+ #MM kernel-fs-afs \
+ #MM kernel-fs-cdvdfs \
+ #MM kernel-fs-fat \
++#MM kernel-fs-exfat \
+ #MM kernel-fs-sfs \
+ #MM kernel-fs-ram \
+ #MM kernel-processor \
+diff --git a/arch/ppc-sam440/boot/mmakefile.src b/arch/ppc-sam440/boot/mmakefile.src
+index fed95e5963..ab967eb461 100644
+--- a/arch/ppc-sam440/boot/mmakefile.src
++++ b/arch/ppc-sam440/boot/mmakefile.src
+@@ -53,6 +53,7 @@ include $(SRCDIR)/config/aros.cfg
+ #MM     workbench-libs-workbench \
+ #MM     kernel-fs-cdvdfs \
+ #MM     kernel-fs-fat \
++#MM     kernel-fs-exfat \
+ #MM     kernel-fs-sfs \
+ #MM     kernel-fs-ram \
+ #MM     kernel-hidd-gfx \
+diff --git a/arch/riscv-native/boot/mmakefile.src b/arch/riscv-native/boot/mmakefile.src
+index 24bbed36eb..0777a18747 100644
+--- a/arch/riscv-native/boot/mmakefile.src
++++ b/arch/riscv-native/boot/mmakefile.src
+@@ -37,6 +37,7 @@ include $(SRCDIR)/config/aros.cfg
+ #MM kernel-fs-afs-quick \
+ #MM kernel-fs-cdvdfs-quick \
+ #MM kernel-fs-fat-quick \
++#MM kernel-fs-exfat-quick \
+ #MM kernel-fs-sfs-quick \
+ #MM kernel-fs-ram-quick \
+ #MM kernel-processor-quick \
+@@ -78,6 +79,7 @@ include $(SRCDIR)/config/aros.cfg
+ #MM kernel-fs-afs \
+ #MM kernel-fs-cdvdfs \
+ #MM kernel-fs-fat \
++#MM kernel-fs-exfat \
+ #MM kernel-fs-sfs \
+ #MM kernel-fs-ram \
+ #MM kernel-processor \
+diff --git a/rom/partition/partition_types.c b/rom/partition/partition_types.c
+index 7d5359194f..1f36beedf2 100644
+--- a/rom/partition/partition_types.c
++++ b/rom/partition/partition_types.c
+@@ -14,6 +14,7 @@
+ 
+ static const uuid_t GPT_Type_EFISystem    = MAKE_UUID(0xC12A7328, 0xF81F, 0x11D2, 0xBA4B, 0x00A0C93EC93BULL);
+ static const uuid_t GPT_Type_HFSPlus      = MAKE_UUID(0x48465300, 0x0000, 0x11AA, 0xAA11, 0x00306543ECACULL);
++static const uuid_t GPT_Type_BasicData    = MAKE_UUID(0xEBD0A0A2, 0xB9E5, 0x4433, 0x87C0, 0x68B6B72699C7ULL);
+ static const uuid_t GPT_Type_FreeBSD_Boot = MAKE_UUID(0x83BD6B9D, 0x7F41, 0x11DC, 0xBE0B, 0x001560B84F0FULL);
+ static const uuid_t GPT_Type_FreeBSD_Data = MAKE_UUID(0x516E7CB4, 0x6ECF, 0x11D6, 0x8FF8, 0x00022D09712BULL);
+ static const uuid_t GPT_Type_NetBSD_FFS   = MAKE_UUID(0x49F48D5A, 0xB10E, 0x11DC, 0xB99B, 0x0019D1879648ULL);
+@@ -24,6 +25,7 @@ const struct TypeMapping PartTypes[] =
+     { 0x04, MAKE_ID('F','A','T','\1'), NULL                  }, /* DOS 16-bit FAT (up to 32M) */
+     { 0x06, MAKE_ID('F','A','T','\1'), NULL                  }, /* DOS 16-bit FAT (over 32M) */
+     { 0x07, MAKE_ID('N','T','F','S') , NULL                  }, /* Windows NT NTFS */
++    { 0x07, MAKE_ID('N','T','F','S') , &GPT_Type_BasicData   }, /* Windows data; probe distinguishes exFAT */
+     { 0x0b, MAKE_ID('F','A','T','\2'), NULL                  }, /* W95 FAT32 */
+     { 0x0c, MAKE_ID('F','A','T','\2'), &GPT_Type_EFISystem   }, /* W95 LBA FAT32 */
+     { 0x0e, MAKE_ID('F','A','T','\1'), NULL                  }, /* W95 16-bit LBA FAT */
+diff --git a/rom/partition/partitiongpt.c b/rom/partition/partitiongpt.c
+index 47e7ab71f2..ea5d5e357d 100644
+--- a/rom/partition/partitiongpt.c
++++ b/rom/partition/partitiongpt.c
+@@ -22,6 +22,7 @@
+  */
+ 
+ #include <exec/memory.h>
++#include <dos/exfat.h>
+ #include <libraries/partition.h>
+ #include <proto/debug.h>
+ #include <proto/exec.h>
+@@ -210,6 +211,29 @@ static void GPT_PatchDosEnvec(struct DosEnvec *de, struct GPTPartition *p)
+     de->de_BootPri = bootpri;
+ }
+ 
++static void ProbeExfatPartition(struct Library *PartitionBase,
++    struct PartitionHandle *ph)
++{
++    ULONG size_longs = ph->de.de_SizeBlock;
++    ULONG size;
++    UBYTE *block;
++
++    /* DosEnvec geometry is external input.  Validate before shifting so a
++       malformed value cannot wrap, or request an unbounded allocation, on a
++       32-bit target. */
++    if (size_longs < 128 || size_longs > 8192
++        || (size_longs & (size_longs - 1)) != 0)
++        return;
++    size = size_longs << 2;
++    block = AllocMem(size, MEMF_ANY);
++    if (block == NULL)
++        return;
++    if (readBlock(PartitionBase, ph, 0, block) == 0
++        && IsExfatBootSector(block, size))
++        setDosType(&ph->de, ID_EXFAT_DISK);
++    FreeMem(block, size);
++}
++
+ static LONG GPTCheckHeader(struct Library *PartitionBase, struct PartitionHandle *root, struct GPTHeader *hdr, UQUAD block)
+ {
+     /* Load the GPT header */
+@@ -362,6 +386,7 @@ static LONG GPTReadPartitionTable(struct Library *PartitionBase, struct Partitio
+ 
+                         /* Map UUID to a DOSType */
+                         GPT_PatchDosEnvec(&gph->ph.de, p);
++                        ProbeExfatPartition(PartitionBase, &gph->ph);
+ 
+                         /* Store the whole entry and convert name into ASCII form */
+                         CopyMem(p, &gph[1], entrysize);
+diff --git a/rom/partition/partitionmbr.c b/rom/partition/partitionmbr.c
+index 40fc87f224..d91043fdc6 100644
+--- a/rom/partition/partitionmbr.c
++++ b/rom/partition/partitionmbr.c
+@@ -4,6 +4,7 @@
+ 
+ #include <exec/memory.h>
+ #include <exec/types.h>
++#include <dos/exfat.h>
+ #include <libraries/partition.h>
+ #include <proto/exec.h>
+ #include <proto/partition.h>
+@@ -20,6 +21,29 @@ struct MBRData {
+     UBYTE position;
+ };
+ 
++static void ProbeExfatPartition(struct Library *PartitionBase,
++    struct PartitionHandle *ph)
++{
++    ULONG size_longs = ph->de.de_SizeBlock;
++    ULONG size;
++    UBYTE *block;
++
++    /* DosEnvec geometry is external input.  Validate before shifting so a
++       malformed value cannot wrap, or request an unbounded allocation, on a
++       32-bit target. */
++    if (size_longs < 128 || size_longs > 8192
++        || (size_longs & (size_longs - 1)) != 0)
++        return;
++    size = size_longs << 2;
++    block = AllocMem(size, MEMF_ANY);
++    if (block == NULL)
++        return;
++    if (readBlock(PartitionBase, ph, 0, block) == 0
++        && IsExfatBootSector(block, size))
++        setDosType(&ph->de, ID_EXFAT_DISK);
++    FreeMem(block, size);
++}
++
+ struct FATBootSector {
+     UBYTE bs_jmp_boot[3];
+     UBYTE bs_oem_name[8];
+@@ -162,6 +186,7 @@ static struct PartitionHandle *PartitionMBRNewHandle(struct Library *PartitionBa
+ 
+                 /* Map type ID to a DOSType */
+                 setDosType(&ph->de, MBR_FindDosType(data->entry->type));
++                ProbeExfatPartition(PartitionBase, ph);
+ 
+                 /* Set position as priority */
+                 ph->ln.ln_Pri = MBR_MAX_PARTITIONS - 1 - position;
+@@ -563,4 +588,3 @@ const struct PTFunctionTable PartitionMBR =
+     PartitionMBRDestroyPartitionTable,
+     NULL
+ };
+-
+diff --git a/rom/usb/classes/massstorage/massstorage.class.c b/rom/usb/classes/massstorage/massstorage.class.c
+index c1936934dc..52de074fb2 100644
+--- a/rom/usb/classes/massstorage/massstorage.class.c
++++ b/rom/usb/classes/massstorage/massstorage.class.c
+@@ -8,6 +8,7 @@
+ #include "debug.h"
+ 
+ #include "massstorage.class.h"
++#include <dos/exfat.h>
+ 
+ #define DEF_NAKTIMEOUT  (600)
+ 
+@@ -5169,6 +5170,7 @@ void CheckFATPartition(struct NepClassMS *ncm, ULONG startblock)
+     struct IOStdReq *stdIO = &nh->nh_IOReq;
+     struct DriveGeometry *tddg = &ncm->ncm_Geometry;
+     BOOL isfat = FALSE;
++    BOOL isexfat = FALSE;
+     BOOL isntfs = FALSE;
+ 
+     mbr = (struct MasterBootRecord *) psdAllocVec(ncm->ncm_BlockSize<<1);
+@@ -5184,11 +5186,13 @@ void CheckFATPartition(struct NepClassMS *ncm, ULONG startblock)
+     stdIO->io_Data = mbr;
+     if(!nIOCmdTunnel(ncm, stdIO))
+     {
++        isexfat = IsExfatBootSector(mbr, ncm->ncm_BlockSize);
+         /* do (super)floppy check */
+-        if(IsFATSuperBlock((struct FATSuperBlock *) mbr))
++        if(isexfat || IsFATSuperBlock((struct FATSuperBlock *) mbr))
+         {
+-            psdAddErrorMsg(RETURN_OK, (STRPTR) GM_UNIQUENAME(libname), "Media is FAT formatted!");
+-            isfat = TRUE;
++            psdAddErrorMsg(RETURN_OK, (STRPTR) GM_UNIQUENAME(libname),
++                isexfat ? "Media is exFAT formatted!" : "Media is FAT formatted!");
++            isfat = !isexfat;
+             nh->nh_RDsk.rdsk_PART.pb_DevFlags = 0;
+ 
+             if(*(ncm->ncm_CUC->cuc_FATDOSName))
+@@ -5238,8 +5242,10 @@ void CheckFATPartition(struct NepClassMS *ncm, ULONG startblock)
+             }
+             envec->de_BootBlocks = 0;
+             envec->de_Interleave = 0;
+-            envec->de_DosType = ncm->ncm_CDC->cdc_FATDosType; //0x46415401; // FAT1
+-            if((ncm->ncm_CDC->cdc_FATDosType & 0xffffff00) == 0x46415400)
++            envec->de_DosType = isexfat
++                ? ID_EXFAT_DISK : ncm->ncm_CDC->cdc_FATDosType;
++            if(!isexfat
++                && (ncm->ncm_CDC->cdc_FATDosType & 0xffffff00) == 0x46415400)
+             {
+                 envec->de_DosType =
+                     GetFATDosType((struct FATSuperBlock *) mbr);
+@@ -5251,10 +5257,12 @@ void CheckFATPartition(struct NepClassMS *ncm, ULONG startblock)
+ 
+             KPRINTF(5, ("building FAT95 style environment\n"));
+ 
+-            strncpy((char *) nh->nh_RDsk.rdsk_FSHD.fhb_FileSysName, ncm->ncm_CDC->cdc_FATFSName, 84);
++            strncpy((char *) nh->nh_RDsk.rdsk_FSHD.fhb_FileSysName,
++                isexfat ? EXFAT_HANDLER_NAME : ncm->ncm_CDC->cdc_FATFSName,
++                84);
+             CheckPartition(ncm);
+         }
+-        if(!(isfat || isntfs))
++        if(!(isfat || isexfat || isntfs))
+         {
+             psdAddErrorMsg(RETURN_OK, (STRPTR) GM_UNIQUENAME(libname),
+                            "Media does not seem to be FAT nor NTFS formatted.");
+@@ -5464,7 +5472,7 @@ AROS_UFH0(void, GM_UNIQUENAME(nGUITask))
+     ncm->ncm_App = (APTR) ApplicationObject,
+         MUIA_Application_Title      , (IPTR) GM_UNIQUENAME(libname),
+         MUIA_Application_Version    , (IPTR) VERSION_STRING,
+-        MUIA_Application_Copyright  , (IPTR) "©2002-2009 Chris Hodges",
++        MUIA_Application_Copyright  , (IPTR) "Â©2002-2009 Chris Hodges",
+         MUIA_Application_Author     , (IPTR) "Chris Hodges <chrisly@platon42.de>",
+         MUIA_Application_Description, (IPTR) "Settings for the massstorage.class",
+         MUIA_Application_Base       , (IPTR) "MASSSTORAGE",
+diff --git a/rom/usb/classes/massstorage/partitions.c b/rom/usb/classes/massstorage/partitions.c
+index 883c5ed297..68cf0aafdd 100644
+--- a/rom/usb/classes/massstorage/partitions.c
++++ b/rom/usb/classes/massstorage/partitions.c
+@@ -18,6 +18,7 @@
+ #include <utility/tagitem.h>
+ #include <devices/bootblock.h>
+ #include <devices/timer.h>
++#include <dos/exfat.h>
+ 
+ #include <proto/exec.h>
+ #include <proto/expansion.h>
+@@ -45,6 +46,7 @@ static const struct _dt {
+     { 0xffffff00, AROS_MAKE_ID('D','O','S','\0'), "afs-handler"   },
+     { 0xffffff00, AROS_MAKE_ID('E','X','T','\0'), "ext-handler"   },
+     { 0xffffff00, AROS_MAKE_ID('F','A','T','\0'), "fat-handler"   },
++    { 0xffffffff, AROS_MAKE_ID('F','A','T','X' ), EXFAT_HANDLER_NAME },
+     { 0xffffff00, AROS_MAKE_ID('L','V','M','\0'), "lvm-handler"   },
+     { 0xffffff00, AROS_MAKE_ID('M','N','X','\0'), "minix-handler" },
+     { 0xffffffff, AROS_MAKE_ID('N','T','F','S' ), "ntfs-handler"  },
+@@ -211,8 +213,8 @@ static VOID AddPartitionVolume(struct NepClassMS *ncm,
+             name[i++] = '0' + (UBYTE)(ppos % 10);
+             name[i] = '\0';
+             D(bug("[Boot] Partition name: %s type: %lu bootable: %d\n", name, ptyp.id[0], bootable));
+-            /* set DOSTYPE based on the partition type */
+-            pp[4 + DE_DOSTYPE] = MatchPartType(ptyp.id[0]);
++            pp[4 + DE_DOSTYPE] = ExfatSelectPartitionDosType(
++                pp[4 + DE_DOSTYPE], MatchPartType(ptyp.id[0]));
+             /* set some common DOSENV fields */
+             pp[4 + DE_TABLESIZE] = DE_BOOTBLOCKS;
+             pp[4 + DE_NUMBUFFERS] = 20;
+@@ -325,4 +327,3 @@ BOOL CheckPartitions(struct NepClassMS *ncm)
+ 
+     return found;
+ }
+-
+diff --git a/workbench/devs/USB/classes/MassStorage/storage_volumes.c b/workbench/devs/USB/classes/MassStorage/storage_volumes.c
+index ab13665dd4..bc94acad6f 100644
+--- a/workbench/devs/USB/classes/MassStorage/storage_volumes.c
++++ b/workbench/devs/USB/classes/MassStorage/storage_volumes.c
+@@ -21,6 +21,7 @@
+ #include <libraries/partition.h>
+ #include <utility/tagitem.h>
+ #include <devices/bootblock.h>
++#include <dos/exfat.h>
+ 
+ #include <proto/exec.h>
+ #include <proto/dos.h>
+@@ -44,6 +45,7 @@ static const struct _dt {
+     { 0xffffff00, AROS_MAKE_ID('D','O','S','\0'), "afs.handler"   },
+     { 0xffffff00, AROS_MAKE_ID('E','X','T','\0'), "ext.handler"   },
+     { 0xffffff00, AROS_MAKE_ID('F','A','T','\0'), "fat.handler"   },
++    { 0xffffffff, AROS_MAKE_ID('F','A','T','X' ), EXFAT_HANDLER_NAME },
+     { 0xffffff00, AROS_MAKE_ID('L','V','M','\0'), "lvm.handler"   },
+     { 0xffffff00, AROS_MAKE_ID('M','N','X','\0'), "minix.handler" },
+     { 0xffffffff, AROS_MAKE_ID('N','T','F','S' ), "ntfs.handler"  },
+@@ -427,12 +429,26 @@ BOOL USBMSS_AddVolume(mss_unit_t *unit)
+     IPTR *pp;
+     TEXT dosdevname[5] = "USB0", *handler;
+     UWORD len;
++    UBYTE *first_block = NULL;
++    BOOL is_exfat = FALSE;
+ 
+     ExpansionBase = (struct ExpansionBase *)OpenLibrary("expansion.library",
+                                                         40L);
+ 
+     if (ExpansionBase)
+     {
++        if (unit->msu_blockSize >= 512)
++        {
++            first_block = AllocMem(unit->msu_blockSize, MEMF_PUBLIC);
++            if (first_block != NULL)
++            {
++                if (HIDD_USBStorage_Read(unit->msu_object, unit->msu_lun,
++                        first_block, 0, 1))
++                    is_exfat = IsExfatBootSector(first_block,
++                        unit->msu_blockSize);
++                FreeMem(first_block, unit->msu_blockSize);
++            }
++        }
+         pp = AllocMem(24*sizeof(IPTR), MEMF_PUBLIC | MEMF_CLEAR);
+ 
+         if (pp)
+@@ -457,7 +473,7 @@ BOOL USBMSS_AddVolume(mss_unit_t *unit)
+             pp[DE_MAXTRANSFER + 4] = 0x00200000;
+             pp[DE_MASK + 4] = 0x7FFFFFFE;
+             pp[DE_BOOTPRI + 4] = 20;
+-            pp[DE_DOSTYPE + 4] = 0x444F5301;
++            pp[DE_DOSTYPE + 4] = is_exfat ? ID_EXFAT_DISK : 0x444F5301;
+             pp[DE_BOOTBLOCKS + 4] = 2;
+             devnode = MakeDosNode(pp);
+ 
+@@ -472,7 +488,7 @@ BOOL USBMSS_AddVolume(mss_unit_t *unit)
+ 				if ((unit->msu_inquiry[0] & 0x1f) == DG_CDROM)
+ 					handler = "cdrom.handler";
+ 				else
+-					handler = "fat.handler";
++					handler = is_exfat ? EXFAT_HANDLER_NAME : "fat.handler";
+ 
+                 len = strlen(handler);
+                 if ((devnode->dn_Handler =
+@@ -518,4 +534,3 @@ BOOL USBMSS_AddVolume(mss_unit_t *unit)
+ 
+     return FALSE;
+ }
+-

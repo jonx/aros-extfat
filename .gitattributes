@@ -1,0 +1,4 @@
+# Preserve imported license texts and unified-diff context verbatim.
+LICENSE.Author -whitespace
+LICENSE.LGPL -whitespace
+integration/*.patch -whitespace

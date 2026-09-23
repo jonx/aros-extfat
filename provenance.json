@@ -1,0 +1,688 @@
+{
+  "format": "exfat-aros-extraction-v1",
+  "source_repositories": {
+    "aros-upstream": {
+      "revision": "9de3df4f3658c8cccd872e56899bcff803abb310",
+      "branch": "darwin-hostdisk"
+    },
+    "Macaros": {
+      "revision": "31d1ecc14bd07826b5fdd76465bf456732184af4",
+      "branch": "main"
+    }
+  },
+  "files": {
+    "compiler/include/dos/exfat.h": {
+      "source": "aros-upstream",
+      "path": "compiler/include/dos/exfat.h",
+      "sha256": "cf0bd86c516b4665e38dd471854ecbb7b483cadc338b5fee5778c219ecdbddd4"
+    },
+    "rom/filesys/exfat/allocation.c": {
+      "source": "aros-upstream",
+      "path": "rom/filesys/exfat/allocation.c",
+      "sha256": "76c22b67d2e8175a18acdd59420265939b6ad2aa3ff8236996d9034f5cd22f95"
+    },
+    "rom/filesys/exfat/cache.c": {
+      "source": "aros-upstream",
+      "path": "rom/filesys/exfat/cache.c",
+      "sha256": "01cd4d1a333ae507feed63743d39ecd63e8a2283e4e3c5c7a6b19f7878067d24"
+    },
+    "rom/filesys/exfat/cache.h": {
+      "source": "aros-upstream",
+      "path": "rom/filesys/exfat/cache.h",
+      "sha256": "77142bd33780291459f6692b2bc05c17f6629187d93bc0d2ae0b2833d5c8bb85"
+    },
+    "rom/filesys/exfat/directory.c": {
+      "source": "aros-upstream",
+      "path": "rom/filesys/exfat/directory.c",
+      "sha256": "2802bca9d04d92327fc3e47aaa6360e6183675ba8c629ca4201440d58176cba2"
+    },
+    "rom/filesys/exfat/disk.c": {
+      "source": "aros-upstream",
+      "path": "rom/filesys/exfat/disk.c",
+      "sha256": "4b98c2ad6290604695bb927e0421b4105b9c545299d4b6384b5d3bbe6e190a11"
+    },
+    "rom/filesys/exfat/exfat.conf": {
+      "source": "aros-upstream",
+      "path": "rom/filesys/exfat/exfat.conf",
+      "sha256": "e3181618d0f61bb6dd7c3bed15f1def832ad3255245f9351030a3b56a5f8bda9"
+    },
+    "rom/filesys/exfat/exfat_boot.h": {
+      "source": "aros-upstream",
+      "path": "rom/filesys/exfat/exfat_boot.h",
+      "sha256": "33571fbaa7e57d1e398b734148d15319af5d26dc5e00dbdc33cf8c0c9f101286"
+    },
+    "rom/filesys/exfat/exfat_bounds.h": {
+      "source": "aros-upstream",
+      "path": "rom/filesys/exfat/exfat_bounds.h",
+      "sha256": "a8d3756a8fd5b3c23a1f64197cb0246d8c33f1fbecb6bc9bc33b994a368cfe05"
+    },
+    "rom/filesys/exfat/exfat_cache_bits.h": {
+      "source": "aros-upstream",
+      "path": "rom/filesys/exfat/exfat_cache_bits.h",
+      "sha256": "f7887ac6122f11ceca50c1e521d02f2fe8fdb11e39459161920c18fdadfb7969"
+    },
+    "rom/filesys/exfat/exfat_debug.h": {
+      "source": "aros-upstream",
+      "path": "rom/filesys/exfat/exfat_debug.h",
+      "sha256": "ce60f4d91824b39af2e4804a67b80a55ae05c87090beb2bd650a2b401d052c17"
+    },
+    "rom/filesys/exfat/exfat_fs.h": {
+      "source": "aros-upstream",
+      "path": "rom/filesys/exfat/exfat_fs.h",
+      "sha256": "074d05b034bfb2dcdea43f7352c56f443e548ace3c34149b603d6e3a2d5870f8"
+    },
+    "rom/filesys/exfat/exfat_meta.h": {
+      "source": "aros-upstream",
+      "path": "rom/filesys/exfat/exfat_meta.h",
+      "sha256": "061a2930fbe1c93102809e0e237cf40f76cccc2424559c40dc3d5bce669dc0a5"
+    },
+    "rom/filesys/exfat/exfat_protos.h": {
+      "source": "aros-upstream",
+      "path": "rom/filesys/exfat/exfat_protos.h",
+      "sha256": "ba09df61c569c991a16974dac981f6761628b1a25e1eb02ca01442154a9b8e78"
+    },
+    "rom/filesys/exfat/exfat_time.h": {
+      "source": "aros-upstream",
+      "path": "rom/filesys/exfat/exfat_time.h",
+      "sha256": "e600a4404803f590985a2eefe5b123daa3d71a322657288f68b06539e21ee9dd"
+    },
+    "rom/filesys/exfat/format.c": {
+      "source": "aros-upstream",
+      "path": "rom/filesys/exfat/format.c",
+      "sha256": "42c70bbdfa59a1b2a3926ceb9691e640e6372c0b9f3d4feb087f36a10b2094b0"
+    },
+    "rom/filesys/exfat/main.c": {
+      "source": "aros-upstream",
+      "path": "rom/filesys/exfat/main.c",
+      "sha256": "80a6c50d92d53f0bb71266c628d9573b01dd8cff2327afe94a6b12a913ea562b"
+    },
+    "rom/filesys/exfat/mmakefile.src": {
+      "source": "aros-upstream",
+      "path": "rom/filesys/exfat/mmakefile.src",
+      "sha256": "3d6202f12330cdc9260365c767b9b3759ebd6fc7af80b32aae8f5bd5115d9d65"
+    },
+    "rom/filesys/exfat/packet.c": {
+      "source": "aros-upstream",
+      "path": "rom/filesys/exfat/packet.c",
+      "sha256": "3ca05eb702e1c0c93b269ccfd952b90fa0d57f4448acd1da88277e9760d2af3b"
+    },
+    "rom/filesys/exfat/stream.c": {
+      "source": "aros-upstream",
+      "path": "rom/filesys/exfat/stream.c",
+      "sha256": "0e370620c06fa8980518f15082dedac47e19e5f4edb29b4a345a88266e8dd763"
+    },
+    "rom/filesys/exfat/support.c": {
+      "source": "aros-upstream",
+      "path": "rom/filesys/exfat/support.c",
+      "sha256": "ea2a725c416043603738c20b4621ed019c6966a08c716549d9967e3e2ac02545"
+    },
+    "rom/filesys/exfat/transaction.c": {
+      "source": "aros-upstream",
+      "path": "rom/filesys/exfat/transaction.c",
+      "sha256": "13b6889476d5900cb5e498dbd96f46261b39bbe3b6c3032e9916d59e283ba7a8"
+    },
+    "rom/filesys/exfat/volume.c": {
+      "source": "aros-upstream",
+      "path": "rom/filesys/exfat/volume.c",
+      "sha256": "73734378b9cc2ccff2e76eb2457522965aed680afffe8c5540ba6d37d2b3bd6a"
+    },
+    "docs/features/CLEANROOM.md": {
+      "source": "Macaros",
+      "path": "docs/features/CLEANROOM.md",
+      "sha256": "b1e6821c56a28ca0637e5f774ac3ff9d5cce6c89afb6607c91060f6987e06d7b"
+    },
+    "docs/features/exfat/HANDOVER.md": {
+      "source": "Macaros",
+      "path": "docs/features/exfat/HANDOVER.md",
+      "sha256": "14382053dbc5b20ed37376b0cf5b41f1452aa36a877b174a28ff098e201678cb"
+    },
+    "docs/features/exfat/README.md": {
+      "source": "Macaros",
+      "path": "docs/features/exfat/README.md",
+      "sha256": "f21d9ed06210620e26dc0cee996e52360d54d9521622b5c43d991b91528ce88c"
+    },
+    "docs/features/exfat/spec.md": {
+      "source": "Macaros",
+      "path": "docs/features/exfat/spec.md",
+      "sha256": "f5ca70db4b99124d8cd454d53ed0bae9018e23e61d60e65024928a03ffb7001c"
+    },
+    "docs/features/exfat/write-spec.md": {
+      "source": "Macaros",
+      "path": "docs/features/exfat/write-spec.md",
+      "sha256": "4a351d6e8280eb0dc3eaa9bde64e0e027d1d5aa71927e96f6e55c5fc7e3343a8"
+    },
+    "graft/exfat-acceptance-smoke": {
+      "source": "Macaros",
+      "path": "graft/exfat-acceptance-smoke",
+      "sha256": "daeb7eace3c4749378933e7ed4ac70c5f934d13a94294f3f839bd851db5202ab"
+    },
+    "graft/exfat-corruption-smoke": {
+      "source": "Macaros",
+      "path": "graft/exfat-corruption-smoke",
+      "sha256": "0314d3182ead1b8d3379b0ec2c2d8ff36946501995ec47a9512e2dd12c0de691"
+    },
+    "graft/exfat-dirty-smoke": {
+      "source": "Macaros",
+      "path": "graft/exfat-dirty-smoke",
+      "sha256": "724c4d1a5befdfcdfde852e9b94b6a0b9d6a8d4a9bb7e3e32d2e22e6602b404a"
+    },
+    "graft/exfat-enumeration-smoke": {
+      "source": "Macaros",
+      "path": "graft/exfat-enumeration-smoke",
+      "sha256": "4951d839a5c6d906c5e5d3d0df8161487422263b72a229733d5a12b3c56ab0bc"
+    },
+    "graft/exfat-failpoint-smoke": {
+      "source": "Macaros",
+      "path": "graft/exfat-failpoint-smoke",
+      "sha256": "82a30c57d5486f3bf27834aca1385b3143ef047ee401e0d1a8c6d290b9d8421b"
+    },
+    "graft/exfat-fdsk64-smoke": {
+      "source": "Macaros",
+      "path": "graft/exfat-fdsk64-smoke",
+      "sha256": "069fb20ddda2da4d5103b2e25544606013d335e927ab2364be75806199693c46"
+    },
+    "graft/exfat-fixture-smoke": {
+      "source": "Macaros",
+      "path": "graft/exfat-fixture-smoke",
+      "sha256": "a917f4a3e3024e8573466394b687049258a162c5f5fda9d75f13afa3fee1980c"
+    },
+    "graft/exfat-format-smoke": {
+      "source": "Macaros",
+      "path": "graft/exfat-format-smoke",
+      "sha256": "0441495b796c8591a5c139f802c71bac4c4ccca42ba74b107e0b9be505b934a1"
+    },
+    "graft/exfat-fragmentation-smoke": {
+      "source": "Macaros",
+      "path": "graft/exfat-fragmentation-smoke",
+      "sha256": "60b7f5a3c044f92f97990e8850c04b08d78695b72825f9572f61021a8dda03a3"
+    },
+    "graft/exfat-full-smoke": {
+      "source": "Macaros",
+      "path": "graft/exfat-full-smoke",
+      "sha256": "40eab5ab375a463cfa942930abe2060c12a67c34d660c99202f5173622db8b6d"
+    },
+    "graft/exfat-geometry-smoke": {
+      "source": "Macaros",
+      "path": "graft/exfat-geometry-smoke",
+      "sha256": "e0fc18ddbe207ba2464e27280daf6b083e75518db03358079a674de1295f5fcc"
+    },
+    "graft/exfat-hotplug-probe-smoke": {
+      "source": "Macaros",
+      "path": "graft/exfat-hotplug-probe-smoke",
+      "sha256": "6c99c8b5cfdcfc04f46087144f26a0220871a7d467be76e7794fa86994d5defe"
+    },
+    "graft/exfat-media-change-smoke": {
+      "source": "Macaros",
+      "path": "graft/exfat-media-change-smoke",
+      "sha256": "418d5497d7a2b15231232c4c80d8a923a5e634e1911fbd3821b6276a1fc3e8cb"
+    },
+    "graft/exfat-sparse-smoke": {
+      "source": "Macaros",
+      "path": "graft/exfat-sparse-smoke",
+      "sha256": "b3196118806b50dded7ae3dc112504deaa64700293e2fab934eecd110ad0d86c"
+    },
+    "graft/exfat-usb-image-smoke": {
+      "source": "Macaros",
+      "path": "graft/exfat-usb-image-smoke",
+      "sha256": "9080116168897a8b57a38fdc1dd2dd95ab7b8fbd8ecd9be8a954def4da97144a"
+    },
+    "graft/exfat-writeprotect-smoke": {
+      "source": "Macaros",
+      "path": "graft/exfat-writeprotect-smoke",
+      "sha256": "2e6561faebf029538606adf377f24427aa11c0f3035d44d70e8814f0b028664c"
+    },
+    "hosted/exfat-tests/.gitignore": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/.gitignore",
+      "sha256": "6820c42dc682e205b11fa27ddfe7116cbd33e1580245dfcfd448148125958bf9"
+    },
+    "hosted/exfat-tests/EXFAT10-device4096.mountlist": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/EXFAT10-device4096.mountlist",
+      "sha256": "3be022ac23be08a9290ea8e1de77d00ad618bdfb76b98f183b67437e5e284eca"
+    },
+    "hosted/exfat-tests/EXFAT10-partition-large.mountlist": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/EXFAT10-partition-large.mountlist",
+      "sha256": "60a8ef49086748724ace014af55d82f99c8d519fd5b686c24ffbfd574ab876dc"
+    },
+    "hosted/exfat-tests/EXFAT10-partition-small.mountlist": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/EXFAT10-partition-small.mountlist",
+      "sha256": "494eb42f13a44996079feadf43427796f59b14737d8464434c1f29153a9a98e5"
+    },
+    "hosted/exfat-tests/EXFAT10.mountlist": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/EXFAT10.mountlist",
+      "sha256": "7163d837eb7cef290ec2f7217098378d73b1e05cad39dde0a02fd28988e08ba3"
+    },
+    "hosted/exfat-tests/EXFAT11-device512.mountlist": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/EXFAT11-device512.mountlist",
+      "sha256": "b08def7d0dafe74043e2a382f62255899eb3cefc1400332e60caee994f14e877"
+    },
+    "hosted/exfat-tests/EXFAT11.mountlist": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/EXFAT11.mountlist",
+      "sha256": "3b056b7707026eec23cc6e6a579bce3266e2b3d012398be62871a20533033ec5"
+    },
+    "hosted/exfat-tests/EXFAT12.mountlist": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/EXFAT12.mountlist",
+      "sha256": "9243a9e7ce0ae1c70f01190915e7f2e086feb9177fd2da09fd2512b640b78965"
+    },
+    "hosted/exfat-tests/EXFAT13.mountlist": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/EXFAT13.mountlist",
+      "sha256": "599ba4bfa539d610465abbc22193e53ef4f6d202e820a9373389e06645bcb1dd"
+    },
+    "hosted/exfat-tests/EXFAT14.mountlist": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/EXFAT14.mountlist",
+      "sha256": "977d2a9f475ee0660994acb2f663ff375df80b8dc3be20e0a2c30f299662d851"
+    },
+    "hosted/exfat-tests/EXFAT15.mountlist": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/EXFAT15.mountlist",
+      "sha256": "90fec052fa4e4f5e8134375da6d8f13c5e55831cd32a79f952e13e8a40bcca49"
+    },
+    "hosted/exfat-tests/EXFAT16.mountlist": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/EXFAT16.mountlist",
+      "sha256": "59ff3032e250a3886736e3cd87b20d1ddf0d41ebeb04d45799c0a4b1bf762236"
+    },
+    "hosted/exfat-tests/EXFAT17.mountlist": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/EXFAT17.mountlist",
+      "sha256": "84347c6e5bf1ec04a1690bc269032b4205bf679e621e3bda13ef5bb322c9ac45"
+    },
+    "hosted/exfat-tests/EXFAT18.mountlist": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/EXFAT18.mountlist",
+      "sha256": "a682f853b16bda8261f97cd1e88145e5a52b85780465974c1d7fd261b72e244b"
+    },
+    "hosted/exfat-tests/EXFAT4.mountlist": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/EXFAT4.mountlist",
+      "sha256": "d086cb5186daa1dc775f82909aca8d52cd8db50f6bdbee62c80a53afc5daede7"
+    },
+    "hosted/exfat-tests/EXFAT5.mountlist": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/EXFAT5.mountlist",
+      "sha256": "3a0c51c5bbc13709a80cc000d36836dafdda2a42b41da1f75bf410e03c1dd2d9"
+    },
+    "hosted/exfat-tests/EXFAT6.mountlist": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/EXFAT6.mountlist",
+      "sha256": "9662b3d5e71a1101f7e1043a6ef3a7aa2625e03126668c5264922d5de3e77530"
+    },
+    "hosted/exfat-tests/EXFAT7.mountlist": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/EXFAT7.mountlist",
+      "sha256": "c8afd7764f8a9935a628c046949149f49715b397e293713eec74a515031e4afe"
+    },
+    "hosted/exfat-tests/EXFAT8.mountlist": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/EXFAT8.mountlist",
+      "sha256": "a0a68c4a2622b67641c7e00a1ba7dc91898465521e8e6f340f672df6b3adb200"
+    },
+    "hosted/exfat-tests/EXFAT9.mountlist": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/EXFAT9.mountlist",
+      "sha256": "3ca8c6ab74ea1223d61afa911a2970f2b54cdd7bed38ad83fab236754fa10190"
+    },
+    "hosted/exfat-tests/build-crt64-probe.sh": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/build-crt64-probe.sh",
+      "sha256": "7632bbc84f4650af1cdc08c9aeced3164a32ec9bab11caf87c74ab03bc1c51d8"
+    },
+    "hosted/exfat-tests/build-exfat-bootregion-probe.sh": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/build-exfat-bootregion-probe.sh",
+      "sha256": "12d4bc62bad8aeb09013d3ce9404632db073f69de146fecb0fa61b2844801095"
+    },
+    "hosted/exfat-tests/build-exfat-dirty-probe.sh": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/build-exfat-dirty-probe.sh",
+      "sha256": "625811dec3b46e9a7c312bef2f01caac032aab5efde18ebff7eba77a78e0d185"
+    },
+    "hosted/exfat-tests/build-exfat-discovery.sh": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/build-exfat-discovery.sh",
+      "sha256": "606e94543e54f675971bcd47a4ec3ef863015afdc92b09c5fbdee0fa2d0f3041"
+    },
+    "hosted/exfat-tests/build-exfat-extension-probe.sh": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/build-exfat-extension-probe.sh",
+      "sha256": "b3b7c722879c0d6946300b4b72b718cadfccbc447181680f92ae85ce48d0b9a9"
+    },
+    "hosted/exfat-tests/build-exfat-failpoint-probe.sh": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/build-exfat-failpoint-probe.sh",
+      "sha256": "e1602b3f3cb00dda9d18bc8077186fc3b2c36444c8cfe1afe27d2baf6b8d7657"
+    },
+    "hosted/exfat-tests/build-exfat-format-probe.sh": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/build-exfat-format-probe.sh",
+      "sha256": "951c1ed810172a747c34f69e47c582fc2470c3b6b75e7cd5725b34976518f032"
+    },
+    "hosted/exfat-tests/build-exfat-full-probe.sh": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/build-exfat-full-probe.sh",
+      "sha256": "28afcaec03e42b857c42d38ad0d3df14fe4960112bf4329faf66417a58ae6c62"
+    },
+    "hosted/exfat-tests/build-exfat-geometry-probe.sh": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/build-exfat-geometry-probe.sh",
+      "sha256": "1c24f9a7b77ee66cfe760ad3761a7046f1f252031e52913c045cd2f32d79c0c0"
+    },
+    "hosted/exfat-tests/build-exfat-hotplug-probe.sh": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/build-exfat-hotplug-probe.sh",
+      "sha256": "c0edb3042027068a1aca7e3e97615669308bf2c6907f1b1726ec15879a71d0a4"
+    },
+    "hosted/exfat-tests/build-exfat-media-change-probe.sh": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/build-exfat-media-change-probe.sh",
+      "sha256": "fa24382e09d71f76ef86a317d6e6726414492d32fe872f861aa7883287bf6779"
+    },
+    "hosted/exfat-tests/build-exfat-name-probe.sh": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/build-exfat-name-probe.sh",
+      "sha256": "946bd697d90610f6b64acf275dafea690e04e42053eae446260a316ed6eb34f5"
+    },
+    "hosted/exfat-tests/build-exfat-protect-probe.sh": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/build-exfat-protect-probe.sh",
+      "sha256": "b27a68d377bc9df967f0ec0b00cd3ae313c53189daeccdad0e659a9294391c67"
+    },
+    "hosted/exfat-tests/build-exfat-readonly-probe.sh": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/build-exfat-readonly-probe.sh",
+      "sha256": "a2087cdc1b9fb1bcf0e9b47db0f33dedda0eee0998953748db8ccfcf408933df"
+    },
+    "hosted/exfat-tests/build-exfat-sparse-probe.sh": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/build-exfat-sparse-probe.sh",
+      "sha256": "2d5b464bd0e72262994c0f0760b5b1dd02f43ca1b827dbfd95a0624e1466db1a"
+    },
+    "hosted/exfat-tests/build-exfat-usb-probe.sh": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/build-exfat-usb-probe.sh",
+      "sha256": "926d4ac9e29a66cc6004f9a1002ec24882df6c81c0a7fc01624f69c6902fad9e"
+    },
+    "hosted/exfat-tests/build-exfat-write-probe.sh": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/build-exfat-write-probe.sh",
+      "sha256": "7ab4ae0683d24fb55ac766ffe19cd768c2155d3013f846dcb64cb6724dddefdd"
+    },
+    "hosted/exfat-tests/build-fdsk64-probe.sh": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/build-fdsk64-probe.sh",
+      "sha256": "e58dcb7266f8741a3597665ce774cdcb82983cb608b7f95ff7c0e1d1739911f2"
+    },
+    "hosted/exfat-tests/build.sh": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/build.sh",
+      "sha256": "df5f4d633f6429b14b5f626f9e293699014b982a1a15d57986946e722afdaa0e"
+    },
+    "hosted/exfat-tests/crt64_probe.c": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/crt64_probe.c",
+      "sha256": "9270a882a06fbc0ad16a8ff3dc6093774579d97515ee45c35b6fc451bf478531"
+    },
+    "hosted/exfat-tests/exfat_bitmap_inspect.py": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/exfat_bitmap_inspect.py",
+      "sha256": "8181b6e7307a1241a6ce7fd55300ca74776b9b3113139e058cc654c2f187cc1b"
+    },
+    "hosted/exfat-tests/exfat_boot_inspect.py": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/exfat_boot_inspect.py",
+      "sha256": "1721270a723d712352d33483090d08c8795eadc603be1ae4dc9266d1209698c4"
+    },
+    "hosted/exfat-tests/exfat_bootregion_probe.c": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/exfat_bootregion_probe.c",
+      "sha256": "d00adcb5ffebf07ddd289b293df931bbcb1e2dab96057414b81b60c385f1c128"
+    },
+    "hosted/exfat-tests/exfat_corrupt.py": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/exfat_corrupt.py",
+      "sha256": "37f0034e1f67ca08d2564426d248bc1ce540f45972ba156556057c08f6ab3d9a"
+    },
+    "hosted/exfat-tests/exfat_delete_fixture.py": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/exfat_delete_fixture.py",
+      "sha256": "5e16c94f0b364f8dcb736007f7f19abdf7d8bfbe7204bc7a64f3a63b517e57e2"
+    },
+    "hosted/exfat-tests/exfat_dirty_probe.c": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/exfat_dirty_probe.c",
+      "sha256": "86ec40459c1d431f5470d78bbc3f51e42cf50d078568a3edecf92e2922d912ca"
+    },
+    "hosted/exfat-tests/exfat_extension_inspect.py": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/exfat_extension_inspect.py",
+      "sha256": "1b348df41fa1e2446526801d4084f8e0780b4afe1c22b6e3a3c82f09662884ce"
+    },
+    "hosted/exfat-tests/exfat_extension_probe.c": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/exfat_extension_probe.c",
+      "sha256": "dd7d89d7f9acc32f25cb09e8803648b200b690273b578a38f93e4b141eab3a3f"
+    },
+    "hosted/exfat-tests/exfat_failpoint_probe.c": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/exfat_failpoint_probe.c",
+      "sha256": "704c46a1a7ecf80d0c71bfb9b7f05354a34de6d19fb29b89784d732bace2e43e"
+    },
+    "hosted/exfat-tests/exfat_fill_volume.py": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/exfat_fill_volume.py",
+      "sha256": "d4784dbcd0e59b489b8cadd413ff66cb3b4be21647152ae3b47c11a4c4f54cca"
+    },
+    "hosted/exfat-tests/exfat_format_inspect.py": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/exfat_format_inspect.py",
+      "sha256": "d43b5ea8161cfc53015eb2284cb3ddad9f1ae1a0755bbab3fc3aa08bb66b741b"
+    },
+    "hosted/exfat-tests/exfat_format_probe.c": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/exfat_format_probe.c",
+      "sha256": "3b10499d86951841c9a3eb2d86d7a53a862119cfa32e6a10ff46a999a3e01ab3"
+    },
+    "hosted/exfat-tests/exfat_full_probe.c": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/exfat_full_probe.c",
+      "sha256": "99450a2a86d38db75086ff5948449bdf0693c353779fb2071a96d748ee824a96"
+    },
+    "hosted/exfat-tests/exfat_geometry_probe.c": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/exfat_geometry_probe.c",
+      "sha256": "9b13bcd812f7f316e51497a385bbaeaa60d17e2d84fa22b9cf300a94d5497b68"
+    },
+    "hosted/exfat-tests/exfat_hotplug_probe.c": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/exfat_hotplug_probe.c",
+      "sha256": "0fc23bf655e6647aac2a243c8028ff2d008ea6748c05b18cdc48f3c0f50fbc84"
+    },
+    "hosted/exfat-tests/exfat_label_inspect.py": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/exfat_label_inspect.py",
+      "sha256": "79b2f4a49ccf559ec6801aa5064c160ff21749f506aaee49a194857d99367f34"
+    },
+    "hosted/exfat-tests/exfat_media_change_probe.c": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/exfat_media_change_probe.c",
+      "sha256": "3af0f1f9702ed827711471bc15b8ab7d83c1ffdc37595bde967030e8e6bd6265"
+    },
+    "hosted/exfat-tests/exfat_name_probe.c": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/exfat_name_probe.c",
+      "sha256": "62a408793d94a91bd6b1f4b12cb7afccef4eb1f3c0bc9431f272609df95a559c"
+    },
+    "hosted/exfat-tests/exfat_protect_probe.c": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/exfat_protect_probe.c",
+      "sha256": "15d91931d7f9315b10c41689c8a692277c9df534ab6ba9371177ac5b2873621f"
+    },
+    "hosted/exfat-tests/exfat_readonly_probe.c": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/exfat_readonly_probe.c",
+      "sha256": "2bfd5402eaeb3864ceddde9bc34087ca9c03870b2221c9bc3face4be7c4b47be"
+    },
+    "hosted/exfat-tests/exfat_set_vdl.py": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/exfat_set_vdl.py",
+      "sha256": "a6deaef9d2e5b31670cd6f8df1003aa5e3074e0df350caaf10813920742865ec"
+    },
+    "hosted/exfat-tests/exfat_sparse_fixture.py": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/exfat_sparse_fixture.py",
+      "sha256": "ee0f5a4b542926409848f93d7643a6f8acdffbcf859ae93436e188f2fc338aed"
+    },
+    "hosted/exfat-tests/exfat_sparse_probe.c": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/exfat_sparse_probe.c",
+      "sha256": "2b08cf630f4c06b470cb35e1987a195cce31d128a3c2be0d8a1ee99a29dae438"
+    },
+    "hosted/exfat-tests/exfat_stream_inspect.py": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/exfat_stream_inspect.py",
+      "sha256": "b2ad644ae3c35a4e3d280d9d5c71e9450d49986c0e890f6d8e1ea1e269cf956d"
+    },
+    "hosted/exfat-tests/exfat_usb_probe.c": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/exfat_usb_probe.c",
+      "sha256": "2436a574eb90cc00d9f4e1c0b470c45f7b20961983f712b0336bd36c90957033"
+    },
+    "hosted/exfat-tests/exfat_volume_flags.py": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/exfat_volume_flags.py",
+      "sha256": "8e5dd892f9341925b35ee75358a76aaa0d026848307aa2a5ee0897bfc008a4bd"
+    },
+    "hosted/exfat-tests/exfat_write_probe.c": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/exfat_write_probe.c",
+      "sha256": "86d23c07887d55f28bb8ae3f08d2bc977df9dd262a22aa314dcce23fff6f4314"
+    },
+    "hosted/exfat-tests/fdsk64_probe.c": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/fdsk64_probe.c",
+      "sha256": "482ac409f657965f7f6950e4b67a7ac2ef4c8d06041692195623715b835109ba"
+    },
+    "hosted/exfat-tests/m68k_headers_check.c": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/m68k_headers_check.c",
+      "sha256": "b3d0d442aaeec4ace3ba4adfa370a926aba0ce24fbac3fc3dd1688e37e1646c2"
+    },
+    "hosted/exfat-tests/t13a_bounds.c": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/t13a_bounds.c",
+      "sha256": "92e1914a08b885354c45fa6f32e420146154072495a6d95e78ef5e12019dc881"
+    },
+    "hosted/exfat-tests/t_boot.c": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/t_boot.c",
+      "sha256": "078dbebde15e0430bd6bb692909761a984d4b1df9fdf4ec36ef7cbc5413d37aa"
+    },
+    "hosted/exfat-tests/t_meta.c": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/t_meta.c",
+      "sha256": "b519d66ec50462d39437ca17c20caa398bbf304e098a9c6f7a561305d5eb1b55"
+    },
+    "hosted/exfat-tests/t_time.c": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/t_time.c",
+      "sha256": "923a6ed640d79657e3de8a0f2d24440d1e2e8755c7e27c806ec0122be57bf39e"
+    },
+    "hosted/exfat-tests/verify-exfat-physical.sh": {
+      "source": "Macaros",
+      "path": "hosted/exfat-tests/verify-exfat-physical.sh",
+      "sha256": "d50b014429bae52006b8f174c3351f78d1f41278a542afc199d07be39c9c4b24"
+    },
+    "LICENSE": {
+      "source": "aros-upstream",
+      "path": "LICENSE",
+      "sha256": "825705f4b1240cf5b88f44ac745dc9d9ebaa71ac087e53bbd69a1c3064ceb9c8"
+    },
+    "LICENSE.Author": {
+      "source": "aros-upstream",
+      "path": "LICENSE.Author",
+      "sha256": "c0f27d937e026f643ef023a8a60940920a30839dc676675ce385b7ac14f911f2"
+    },
+    "LICENSE.LGPL": {
+      "source": "aros-upstream",
+      "path": "LICENSE.LGPL",
+      "sha256": "a190dc9c8043755d90f8b0a75fa66b9e42d4af4c980bf5ddc633f0124db3cee7"
+    }
+  },
+  "integration": {
+    "base": "a33f87c31003100e05fe82d703f432bbba8247dc",
+    "source_revision": "9de3df4f3658c8cccd872e56899bcff803abb310",
+    "paths": [
+      "arch/all-hosted/mmakefile",
+      "arch/all-native/mmakefile.src",
+      "arch/arm-raspi/boot/mmakefile.src",
+      "arch/ppc-sam440/boot/mmakefile.src",
+      "arch/riscv-native/boot/mmakefile.src",
+      "rom/filesys/mmakefile.src",
+      "rom/partition/partition_types.c",
+      "rom/partition/partitiongpt.c",
+      "rom/partition/partitionmbr.c",
+      "rom/usb/classes/massstorage/massstorage.class.c",
+      "rom/usb/classes/massstorage/partitions.c",
+      "workbench/devs/USB/classes/MassStorage/storage_volumes.c"
+    ]
+  },
+  "history": [
+    {
+      "original": "d4787c6b73fb52af87e8b61d172a5cc3b51630bd",
+      "extracted": "b99166943da80a6c2949ba12fef15303fc4260fb"
+    },
+    {
+      "original": "a0bfa3de784f370fd628644664ed2d762d09c15e",
+      "extracted": "692769983b1a08408bd211be6f21d197fd1c2ec5"
+    },
+    {
+      "original": "6a588892abc099c4f21c72d28c41e78f90419069",
+      "extracted": "60176fd4a2b983296a182a39875ac7471a73f1ec"
+    },
+    {
+      "original": "07bfeec1ec0b9a8eaf94bdea4da33f15eb237fd6",
+      "extracted": "a19ae8d4f02908da13285746086304c21ae70f16"
+    },
+    {
+      "original": "528a62dd3e5dd6ebf7e19096f01a8bce4efbb30c",
+      "extracted": "2249f08fd67bb758f1ecbd0f86a2928b2dcecae8"
+    },
+    {
+      "original": "601a0bfbee2f55f3f49ca182e3ac5e51525aea95",
+      "extracted": "dcefabb94bb581d746cfbbe6d2666adb35bed945"
+    },
+    {
+      "original": "fed1b6054eb4a1b6f4418a6d4b8a0edd5f2bd3d3",
+      "extracted": "04ac996313735c356d7701bb45428b23a1120dc2"
+    },
+    {
+      "original": "e50b4bcf29e3474029345223e40d0199143974e3",
+      "extracted": "8cb35c546cad5b64a0ccf4c82a73d83d0bf07f2c"
+    },
+    {
+      "original": "1e8405e5ef8ea4b771e3da5fedf215ad26464a4b",
+      "extracted": "d36e05991ce208f83ea82323c03cc08a562a18e6"
+    },
+    {
+      "original": "8f2d3eed058e6bc0f2976d39cb25c9486f3646fb",
+      "extracted": "51a792cfe7dd96ca62953658a133f1cb2b6e933e"
+    },
+    {
+      "original": "026038f40ed9a5a706724a7ad2e3e9b4c6c17c12",
+      "extracted": "c3e432bb1dc8686bfeecb949ad5b247632a9100d"
+    },
+    {
+      "original": "c4256ae23644a8b34699b4d879db779f8629efce",
+      "extracted": "3fc067c96babf955995fb1800874655deed2ae54"
+    }
+  ]
+}
