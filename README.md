@@ -4,6 +4,15 @@
 AROS exFAT filesystem handler, in preparation for contribution to AROS upstream.
 The filesystem name is **exFAT**; the repository name is **aros-extfat**.
 
+This project is part of John Knipper's series of native filesystem drivers for AROS.
+[AFS+](https://github.com/jonx/afsplus) is a 64-bit filesystem with Unicode
+filenames and transactions for recovery after a power loss.
+The [exFAT handler](https://github.com/jonx/aros-extfat) reads, writes and
+formats removable media for exchanging files with other operating systems.
+The [APFS reader](https://github.com/pomaros/aros-apfs) mounts unlocked Apple
+File System volumes read-only so you can browse directories and copy files
+from a disk or a raw GPT image.
+
 The implementation was developed from the published Microsoft exFAT
 specification and the AROS DOS interfaces. Its provenance and independence
 rules are recorded in [CLEANROOM.md](docs/features/CLEANROOM.md) and the
